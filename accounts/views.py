@@ -1,6 +1,7 @@
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, APIException
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,12 +15,12 @@ def user_create_view(request):
     serializer = UserCreateSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serialized_data = serializer.data
-    user, is_created = User.objects.get_or_create(telegram_id=serialized_data['telegram_id'],
-                                                  username=serialized_data['username'])
+    try:
+        user = User.objects.create(telegram_id=serialized_data['telegram_id'], username=serialized_data['username'])
+    except IntegrityError:
+        raise APIException('User already exists', status.HTTP_409_CONFLICT)
     serializer = UserRetrieveSerializer(user)
-    response_status = status.HTTP_201_CREATED if is_created else status.HTTP_409_CONFLICT
-    response_data = serializer.data | {'is_created': is_created}
-    return Response(response_data, response_status)
+    return Response(serializer.data, status.HTTP_201_CREATED)
 
 
 class UserDetailView(APIView):
