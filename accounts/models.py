@@ -9,6 +9,10 @@ class User(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_banned = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name = 'telegram user'
+        verbose_name_plural = 'telegram users'
+
     def __str__(self):
         name = f'User {self.telegram_id}'
         if self.username is not None:
