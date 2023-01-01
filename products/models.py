@@ -26,7 +26,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     picture_url = models.ImageField(null=True, blank=True, upload_to='pictures')
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    quantity = models.SmallIntegerField(default=0)
+    stocks_count = models.SmallIntegerField(default=0)
     content = models.TextField()
     type = models.CharField(max_length=64, default='text')
 
