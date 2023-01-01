@@ -10,7 +10,7 @@ class SupportSubject(models.Model):
         return self.name
 
 
-class SupportRequest(models.Model):
+class SupportTicket(models.Model):
     STATUSES = (
         (1, 'Open'),
         (2, 'Pending'),

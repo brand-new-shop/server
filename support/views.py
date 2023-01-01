@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
-from support.models import SupportSubject, SupportRequest
+from support.models import SupportSubject, SupportTicket
 from support.serializers import SupportSubjectSerializer, SupportRequestCreateSerializer, SupportRequestSerializer
 
 
@@ -25,7 +25,7 @@ class SupportRequestListCreateView(APIView):
 
     def get(self, request, user_telegram_id: int):
         support_requests = (
-            SupportRequest.objects
+            SupportTicket.objects
             .select_related('user')
             .filter(user__telegram_id=user_telegram_id)
             .values('id', 'issue')
@@ -44,7 +44,7 @@ class SupportRequestListCreateView(APIView):
             raise NotFound('User by Telegram ID is not found')
 
         serialized_data = serializer.data
-        support_request = SupportRequest.objects.create(
+        support_request = SupportTicket.objects.create(
             user_id=user_ids[0],
             issue=serialized_data['issue'],
             subject_id=serialized_data['subject_id'],
@@ -55,5 +55,5 @@ class SupportRequestListCreateView(APIView):
 
 class SupportRequestRetrieveView(RetrieveAPIView):
     serializer_class = SupportRequestSerializer
-    queryset = SupportRequest.objects.all()
+    queryset = SupportTicket.objects.all()
     lookup_url_kwarg = 'support_request_id'

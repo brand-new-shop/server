@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from support.models import SupportSubject, SupportRequest
+from support.models import SupportSubject, SupportTicket
 
 
 @admin.register(SupportSubject)
@@ -8,7 +8,7 @@ class SupportSubjectAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 
-@admin.register(SupportRequest)
+@admin.register(SupportTicket)
 class SupportRequest(admin.ModelAdmin):
     list_filter = ('status', 'subject')
     search_fields = ('issue',)
