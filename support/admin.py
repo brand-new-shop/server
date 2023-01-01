@@ -15,3 +15,7 @@ class SupportRequest(admin.ModelAdmin):
     search_help_text = 'Search in request\'s issue text'
     ordering = ('-created_at',)
     readonly_fields = ('user', 'subject', 'issue', 'created_at',)
+    list_select_related = ('user', 'subject')
+
+    def has_add_permission(self, request):
+        return False
