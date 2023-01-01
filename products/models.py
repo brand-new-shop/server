@@ -9,10 +9,12 @@ class Category(models.Model):
     name = models.CharField(max_length=255)
     emoji_icon = models.CharField(max_length=8, null=True, blank=True)
     is_hidden = models.BooleanField(default=False)
+    priority = models.PositiveSmallIntegerField(help_text='the smaller number the higher priority')
     parent = models.ForeignKey('Category', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         verbose_name_plural = 'categories'
+        unique_together = ('parent', 'priority')
 
     def __str__(self):
         if self.emoji_icon is not None:

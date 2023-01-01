@@ -36,6 +36,8 @@ class ProductInline(admin.StackedInline):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_filter = (CategoryParentListFilter,)
+    ordering = ('priority',)
+    list_display = ('__str__', 'priority',)
     inlines = (CategoryInline, ProductInline)
 
 

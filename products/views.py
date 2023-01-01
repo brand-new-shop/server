@@ -8,7 +8,12 @@ from products.serializers import CategorySerializer, ProductSerializer
 
 @api_view(['GET'])
 def categories_list_view(request):
-    categories = Category.objects.filter(is_hidden=False).filter(parent=None).values('id', 'name', 'emoji_icon')
+    categories = (
+        Category.objects
+        .filter(is_hidden=False, parent=None)
+        .order_by('priority')
+        .values('id', 'name', 'emoji_icon')
+    )
     return Response(categories)
 
 
@@ -20,7 +25,12 @@ def category_products_list_view(request, category_id: int):
 
 @api_view(['GET'])
 def subcategories_list_view(request, category_id: int):
-    subcategories = Category.objects.filter(parent_id=category_id, is_hidden=False).values('id', 'name', 'emoji_icon')
+    subcategories = (
+        Category.objects
+        .filter(parent_id=category_id, is_hidden=False)
+        .order_by('priority')
+        .values('id', 'name', 'emoji_icon')
+    )
     return Response(subcategories)
 
 
