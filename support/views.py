@@ -1,24 +1,13 @@
 from django.utils.text import Truncator
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
-from support.models import SupportSubject, SupportTicket
-from support.serializers import SupportSubjectSerializer, SupportRequestCreateSerializer, SupportRequestSerializer
-
-
-class SupportSubjectsListCreateView(ListCreateAPIView):
-    serializer_class = SupportSubjectSerializer
-    queryset = SupportSubject.objects.all()
-
-
-class SupportSubjectsRetrieveView(RetrieveAPIView):
-    serializer_class = SupportSubjectSerializer
-    queryset = SupportSubject.objects.all()
-    lookup_url_kwarg = 'support_subject_id'
+from support.models import SupportTicket
+from support.serializers import SupportRequestCreateSerializer, SupportRequestSerializer
 
 
 class SupportRequestListCreateView(APIView):

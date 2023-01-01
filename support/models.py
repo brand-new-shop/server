@@ -3,13 +3,6 @@ from django.db import models
 from accounts.models import User
 
 
-class SupportSubject(models.Model):
-    name = models.CharField(max_length=64, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
 class SupportTicket(models.Model):
     STATUSES = (
         (1, 'Open'),
@@ -19,7 +12,7 @@ class SupportTicket(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.ForeignKey(SupportSubject, on_delete=models.CASCADE)
+    subject = models.CharField(max_length=64)
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.PositiveSmallIntegerField(choices=STATUSES, default=1)
     issue = models.TextField()
@@ -29,4 +22,4 @@ class SupportTicket(models.Model):
         username = self.user.username
         if username is None:
             username = str(self.user.telegram_id)
-        return f'@{username} - #{self.id} {self.subject.name}'
+        return f'@{username} - #{self.id} {self.subject}'

@@ -1,12 +1,6 @@
 from rest_framework import serializers
 
-from support.models import SupportSubject, SupportTicket
-
-
-class SupportSubjectSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SupportSubject
-        fields = '__all__'
+from support.models import SupportTicket
 
 
 class SupportRequestCreateSerializer(serializers.Serializer):

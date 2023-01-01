@@ -1,12 +1,7 @@
 from django.contrib import admin
 from rangefilter.filters import DateTimeRangeFilter
 
-from support.models import SupportSubject, SupportTicket
-
-
-@admin.register(SupportSubject)
-class SupportSubjectAdmin(admin.ModelAdmin):
-    ordering = ('name',)
+from support.models import SupportTicket
 
 
 @admin.register(SupportTicket)
@@ -16,7 +11,7 @@ class SupportRequest(admin.ModelAdmin):
     search_help_text = 'Please enter Username or Telegram ID of the User you want to show their tickets (leave empty for all Users)'
     ordering = ('-created_at',)
     readonly_fields = ('user', 'subject', 'issue', 'created_at',)
-    list_select_related = ('user', 'subject')
+    list_select_related = ('user',)
 
     def has_add_permission(self, request):
         return False
