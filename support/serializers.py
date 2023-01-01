@@ -3,13 +3,14 @@ from rest_framework import serializers
 from support.models import SupportTicket
 
 
-class SupportRequestCreateSerializer(serializers.Serializer):
-    subject_id = serializers.IntegerField()
-    issue = serializers.CharField(max_length=4096)
-
-
-class SupportRequestSerializer(serializers.ModelSerializer):
+class SupportTicketCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupportTicket
-        fields = ('id', 'created_at', 'is_open', 'issue', 'answer', 'subject')
-        depth = 1
+        fields = ('subject', 'issue')
+
+
+class SupportTicketSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='get_status_display')
+    class Meta:
+        model = SupportTicket
+        fields = ('id', 'created_at', 'status', 'issue', 'answer', 'subject')

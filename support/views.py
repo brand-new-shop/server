@@ -1,48 +1,50 @@
-from django.utils.text import Truncator
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
 from support.models import SupportTicket
-from support.serializers import SupportRequestCreateSerializer, SupportRequestSerializer
+from support.serializers import SupportTicketCreateSerializer, SupportTicketSerializer
 
 
-class SupportRequestListCreateView(APIView):
+class SupportTicketListCreateView(APIView):
 
-    def get(self, request, user_telegram_id: int):
+    def get(self, request, telegram_id: int):
         support_requests = (
             SupportTicket.objects
             .select_related('user')
-            .filter(user__telegram_id=user_telegram_id)
-            .values('id', 'issue')
+            .filter(user__telegram_id=telegram_id)
+            .values('id', 'status', 'subject')
         )
-        response_data = [{'id': support_request['id'],
-                          'issue_preview': Truncator(support_request['issue']).words(num=10, truncate='...')}
-                         for support_request in support_requests]
+        if not support_requests:
+            raise NotFound("User's tickets have not found")
+        response_data = [
+            {
+                'id': request['id'],
+                'status': SupportTicket.Status(request['status']).label,
+                'subject': request['subject']
+            }
+            for request in support_requests
+        ]
         return Response(response_data)
 
-    def post(self, request, user_telegram_id: int):
-        serializer = SupportRequestCreateSerializer(data=request.data)
+    def post(self, request, telegram_id: int):
+        serializer = SupportTicketCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
-        user_ids = User.objects.filter(telegram_id=user_telegram_id).values_list('id', flat=True)
-        if not user_ids:
-            raise NotFound('User by Telegram ID is not found')
-
+        user = get_object_or_404(User, telegram_id=telegram_id)
         serialized_data = serializer.data
-        support_request = SupportTicket.objects.create(
-            user_id=user_ids[0],
+        support_ticket = SupportTicket.objects.create(
+            user=user,
             issue=serialized_data['issue'],
-            subject_id=serialized_data['subject_id'],
+            subject=serialized_data['subject']
         )
-        response_data = {'id': support_request.id}
+        response_data = {'id': support_ticket.id}
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class SupportRequestRetrieveView(RetrieveAPIView):
-    serializer_class = SupportRequestSerializer
+class SupportTicketRetrieveView(RetrieveAPIView):
+    serializer_class = SupportTicketSerializer
     queryset = SupportTicket.objects.all()
-    lookup_url_kwarg = 'support_request_id'
+    lookup_url_kwarg = 'ticket_id'
