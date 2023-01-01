@@ -26,4 +26,7 @@ class SupportRequest(models.Model):
     answer = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return Truncator(self.issue).words(num=10, truncate="...")
+        username = self.user.username
+        if username is None:
+            username = str(self.user.telegram_id)
+        return f'@{username} - #{self.id} {self.subject.name}'
