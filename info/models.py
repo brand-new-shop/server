@@ -5,6 +5,7 @@ class ShopInfo(models.Model):
     KEYS = (
         ('faq', 'FAQ'),
         ('rules', 'Rules'),
+        ('support_rules', 'Support Rules'),
     )
     key = models.CharField(max_length=255, choices=KEYS, unique=True)
     value = models.TextField()
