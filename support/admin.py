@@ -10,7 +10,7 @@ class SupportSubjectAdmin(admin.ModelAdmin):
 
 @admin.register(SupportRequest)
 class SupportRequest(admin.ModelAdmin):
-    list_filter = ('is_open', 'subject')
+    list_filter = ('status', 'subject')
     search_fields = ('issue',)
     search_help_text = 'Search in request\'s issue text'
     ordering = ('-created_at',)
