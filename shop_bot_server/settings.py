@@ -13,6 +13,8 @@ DEBUG = env.bool('DEBUG')
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
+TICKET_CREATION_DELAY_IN_SECONDS = env.int('TICKET_CREATION_DELAY_IN_SECONDS')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
