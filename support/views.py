@@ -16,6 +16,7 @@ class SupportTicketListCreateView(APIView):
             SupportTicket.objects
             .select_related('user')
             .filter(user__telegram_id=telegram_id)
+            .order_by('-created_at')
             .values('id', 'status', 'subject')
         )
         if not support_requests:
