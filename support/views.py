@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
-from support.exceptions import SupportTicketCreationRateLimitExceeded
+from support.exceptions import SupportTicketCreationRateLimitExceeded, TicketIsClosed
 from support.models import SupportTicket, ReplyToTicket
 from support.serializers import (
     SupportTicketCreateSerializer,
@@ -93,6 +93,8 @@ class ReplyToTicketListCreateView(APIView):
         serializer.is_valid(raise_exception=True)
         serialized_data = serializer.data
         support_ticket = get_object_or_404(SupportTicket, id=ticket_id)
+        if support_ticket.status == SupportTicket.Status.CLOSED:
+            raise TicketIsClosed
         reply_to_ticket = ReplyToTicket.objects.create(ticket=support_ticket, issue=serialized_data['issue'])
         return Response({'id': reply_to_ticket.id}, status=status.HTTP_201_CREATED)
 
