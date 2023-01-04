@@ -22,3 +22,17 @@ class SupportTicket(models.Model):
         if username is None:
             username = str(self.user.telegram_id)
         return f'@{username} - #{self.id} {self.subject}'
+
+
+class ReplyToTicket(models.Model):
+    ticket = models.ForeignKey(SupportTicket, on_delete=models.CASCADE)
+    issue = models.TextField(max_length=4096)
+    answer = models.TextField(max_length=4096, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'reply'
+        verbose_name_plural = 'replies'
+
+    def __str__(self):
+        return f'Reply to ticket #{self.ticket_id}'
