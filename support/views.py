@@ -65,7 +65,7 @@ class SupportTicketListCreateView(APIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-class SupportTicketRetrieveView(RetrieveAPIView):
+class SupportTicketRetrieveUpdateView(RetrieveAPIView):
     serializer_class = SupportTicketSerializer
     queryset = SupportTicket.objects.all()
     lookup_url_kwarg = 'ticket_id'
