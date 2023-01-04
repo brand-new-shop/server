@@ -64,3 +64,9 @@ class SupportTicketRetrieveView(RetrieveAPIView):
     serializer_class = SupportTicketSerializer
     queryset = SupportTicket.objects.all()
     lookup_url_kwarg = 'ticket_id'
+
+    def patch(self, request, ticket_id: int):
+        updated_rows_count = SupportTicket.objects.filter(id=ticket_id).update(status=SupportTicket.Status.CLOSED)
+        if not updated_rows_count:
+            raise NotFound('Ticket is not found')
+        return Response(status=status.HTTP_204_NO_CONTENT)
