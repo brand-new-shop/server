@@ -46,10 +46,11 @@ class SupportTicketListCreateView(APIView):
             .values_list('created_at', flat=True)
             .first()
         )
-        passed_seconds_since_last_ticket = (timezone.now() - last_ticket_created_at).total_seconds()
-        seconds_to_wait = int(settings.TICKET_CREATION_DELAY_IN_SECONDS - passed_seconds_since_last_ticket)
-        if seconds_to_wait > 0:
-            raise SupportTicketCreationRateLimitExceeded(seconds_to_wait)
+        if last_ticket_created_at is not None:
+            passed_seconds_since_last_ticket = (timezone.now() - last_ticket_created_at).total_seconds()
+            seconds_to_wait = int(settings.TICKET_CREATION_DELAY_IN_SECONDS - passed_seconds_since_last_ticket)
+            if seconds_to_wait > 0:
+                raise SupportTicketCreationRateLimitExceeded(seconds_to_wait)
         support_ticket = SupportTicket.objects.create(
             user=user,
             issue=serialized_data['issue'],
