@@ -1,15 +1,20 @@
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.exceptions import NotFound, APIException
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
 from support.exceptions import SupportTicketCreationRateLimitExceeded
-from support.models import SupportTicket
-from support.serializers import SupportTicketCreateSerializer, SupportTicketSerializer
+from support.models import SupportTicket, ReplyToTicket
+from support.serializers import (
+    SupportTicketCreateSerializer,
+    SupportTicketSerializer,
+    ReplyToTicketCreateSerializer,
+    ReplyToTicketSerializer,
+)
 
 
 class SupportTicketListCreateView(APIView):
@@ -70,3 +75,29 @@ class SupportTicketRetrieveView(RetrieveAPIView):
         if not updated_rows_count:
             raise NotFound('Ticket is not found')
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ReplyToTicketListCreateView(APIView):
+
+    def get(self, request, ticket_id: int):
+        reply_ids = (
+            ReplyToTicket.objects
+            .filter(ticket_id=ticket_id)
+            .values_list('id', flat=True)
+            .order_by('created_at')
+        )
+        return Response(reply_ids)
+
+    def post(self, request, ticket_id: int):
+        serializer = ReplyToTicketCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+        support_ticket = get_object_or_404(SupportTicket, id=ticket_id)
+        reply_to_ticket = ReplyToTicket.objects.create(ticket=support_ticket, issue=serialized_data['issue'])
+        return Response({'id': reply_to_ticket.id})
+
+
+class ReplyToTicketRetrieveView(RetrieveAPIView):
+    serializer_class = ReplyToTicketSerializer
+    queryset = ReplyToTicket.objects.all()
+    lookup_url_kwarg = 'reply_id'
