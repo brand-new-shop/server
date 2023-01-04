@@ -94,7 +94,7 @@ class ReplyToTicketListCreateView(APIView):
         serialized_data = serializer.data
         support_ticket = get_object_or_404(SupportTicket, id=ticket_id)
         reply_to_ticket = ReplyToTicket.objects.create(ticket=support_ticket, issue=serialized_data['issue'])
-        return Response({'id': reply_to_ticket.id})
+        return Response({'id': reply_to_ticket.id}, status=status.HTTP_201_CREATED)
 
 
 class ReplyToTicketRetrieveView(RetrieveAPIView):
