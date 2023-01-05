@@ -15,6 +15,8 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
 TICKET_CREATION_DELAY_IN_SECONDS = env.int('TICKET_CREATION_DELAY_IN_SECONDS')
 
+COINBASE_API_KEY = env.str('COINBASE_API_KEY')
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -28,6 +30,7 @@ INSTALLED_APPS = [
     'support',
     'products',
     'info',
+    'payments',
 ]
 
 MIDDLEWARE = [
