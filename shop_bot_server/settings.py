@@ -19,6 +19,8 @@ COINBASE_API_KEY = env.str('COINBASE_API_KEY')
 
 CELERY_BROKER_URL = env.str('CELERY_BROKER_URL')
 
+TELEGRAM_BOT_TOKEN = env.str('TELEGRAM_BOT_TOKEN')
+
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 INSTALLED_APPS = [
