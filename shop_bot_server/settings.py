@@ -17,6 +17,10 @@ TICKET_CREATION_DELAY_IN_SECONDS = env.int('TICKET_CREATION_DELAY_IN_SECONDS')
 
 COINBASE_API_KEY = env.str('COINBASE_API_KEY')
 
+CELERY_BROKER_URL = env.str('CELERY_BROKER_URL')
+
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -25,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_celery_beat',
     'rangefilter',
     'accounts',
     'support',
