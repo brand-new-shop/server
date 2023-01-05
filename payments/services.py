@@ -3,11 +3,13 @@ from decimal import Decimal
 from uuid import UUID
 
 import coinbase_commerce
+from coinbase_commerce.error import ResourceNotFoundError
 from django.db import transaction
 
 from accounts.models import User
 from payments.models import CoinbasePayment
 from payments.schemas import CoinbaseCharge
+from payments.exceptions import CoinbasePaymentNotFoundError
 
 
 def create_charge(
@@ -31,7 +33,10 @@ def create_charge(
 
 
 def get_charge(client: coinbase_commerce.Client, charge_uuid: UUID) -> CoinbaseCharge:
-    charge = client.charge.retrieve(str(charge_uuid))
+    try:
+        charge = client.charge.retrieve(str(charge_uuid))
+    except ResourceNotFoundError:
+        raise CoinbasePaymentNotFoundError(payment_uuid=charge_uuid)
     return CoinbaseCharge(
         uuid=charge['id'],
         payment_amount=Decimal(charge['pricing']['local']['amount']),
