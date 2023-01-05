@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
 
-from products.models import Category, Product, Order
+from products.models import Category, Product, Order, ProductPicture
 
 
 class CategoryParentListFilter(SimpleListFilter):
@@ -33,12 +33,19 @@ class ProductInline(admin.StackedInline):
     model = Product
 
 
+class ProductPictureInline(admin.StackedInline):
+    model = ProductPicture
+    classes = ('collapse',)
+    extra = 0
+
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_filter = (CategoryParentListFilter,)
     ordering = ('priority',)
     list_display = ('__str__', 'priority',)
-    inlines = (CategoryInline, ProductInline)
+    inlines = (CategoryInline,)
+    search_fields = ('name',)
 
 
 @admin.register(Order)
@@ -57,3 +64,26 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('name',)
     search_fields = ('name',)
     search_help_text = 'Search by product\'s name'
+    inlines = (ProductPictureInline,)
+    autocomplete_fields = ('category',)
+    fieldsets = (
+        (None, {
+            'fields': (
+                'name',
+                'description',
+                'category',
+                'price',
+                'stocks_count',
+                'content',
+                'type',
+            )
+        }),
+        ('Specific Advanced Settings', {
+            'classes': ('collapse',),
+            'fields': (
+                ('min_order_quantity', 'max_order_quantity'),
+                'max_replacement_time_in_minutes',
+                ('is_stocks_displayed', 'is_hidden', 'can_be_purchased'),
+            ),
+        }),
+    )
