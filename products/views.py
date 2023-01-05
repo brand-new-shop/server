@@ -1,8 +1,9 @@
+from django.conf import settings
 from rest_framework.decorators import api_view
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, get_object_or_404
 from rest_framework.response import Response
 
-from products.models import Category, Product
+from products.models import Category, Product, ProductPicture
 from products.serializers import CategorySerializer, ProductSerializer
 
 
@@ -19,7 +20,7 @@ def categories_list_view(request):
 
 @api_view(['GET'])
 def category_products_list_view(request, category_id: int):
-    products = Product.objects.filter(category_id=category_id).values('id', 'name')
+    products = Product.objects.filter(category_id=category_id, is_hidden=False).values('id', 'name')
     return Response(products)
 
 
@@ -40,7 +41,10 @@ class CategoryRetrieveView(RetrieveAPIView):
     lookup_url_kwarg = 'category_id'
 
 
-class ProductRetrieveView(RetrieveAPIView):
-    serializer_class = ProductSerializer
-    queryset = Product.objects.all()
-    lookup_url_kwarg = 'product_id'
+@api_view(['GET'])
+def product_retrieve_view(request, product_id: int):
+    product = get_object_or_404(Product, id=product_id)
+    picture_urls = product.productpicture_set.values_list('picture', flat=True)
+    picture_urls = [settings.MEDIA_URL + url for url in picture_urls]
+    response_data = ProductSerializer(product).data | {'picture_urls': picture_urls}
+    return Response(response_data)
