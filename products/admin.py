@@ -83,7 +83,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': (
                 ('min_order_quantity', 'max_order_quantity'),
                 'max_replacement_time_in_minutes',
-                ('is_stocks_displayed', 'is_hidden', 'can_be_purchased'),
+                ('are_stocks_displayed', 'is_hidden', 'can_be_purchased'),
             ),
         }),
     )
