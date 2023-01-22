@@ -47,12 +47,16 @@ class TestUpdateCardProductQuantity(CartProductTestCase):
         super().setUp()
         self.product.refresh_from_db()
 
-    def test_card_product_update_quantity(self):
+    def test_card_product_update_quantity(self) -> None:
         cart_product = create_cart_product(self.user, self.product, quantity=5)
         self.assertEqual(self.product.stocks_count, 5)
         update_cart_product_quantity(cart_product, 6)
         self.assertEqual(cart_product.quantity, 6)
         self.assertEqual(self.product.stocks_count, 4)
+
+        cart_product.delete()
+        self.product.stocks_count = 10
+        self.product.save()
 
         cart_product = create_cart_product(self.user, self.product, quantity=5)
         self.assertEqual(self.product.stocks_count, 5)
