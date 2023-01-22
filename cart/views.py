@@ -43,12 +43,7 @@ class CartProductListCreateView(APIView):
         user = get_user_or_raise_404(telegram_id)
         product = get_product_or_raise_404(product_id)
 
-        if product.stocks_count < quantity:
-            raise NotEnoughProductStocks
-        try:
-            cart_product = create_cart_product(user, product, quantity)
-        except IntegrityError:
-            raise ProductAlreadyExistsInCart
+        cart_product = create_cart_product(user, product, quantity)
 
         response_data = {
             'cart_product_id': cart_product.id,
