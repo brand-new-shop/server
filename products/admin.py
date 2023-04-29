@@ -27,6 +27,16 @@ class CategoryInline(admin.TabularInline):
     model = Category
     verbose_name = 'subcategory'
     verbose_name_plural = 'subcategories'
+    extra = 0
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ProductInline(admin.StackedInline):
@@ -74,16 +84,22 @@ class ProductAdmin(admin.ModelAdmin):
                 'category',
                 'price',
                 'stocks_count',
-                'content',
-                'type',
             )
         }),
         ('Specific Advanced Settings', {
             'classes': ('collapse',),
             'fields': (
-                ('min_order_quantity', 'max_order_quantity'),
+                (
+                    'min_order_quantity',
+                    'max_order_quantity',
+                ),
                 'max_replacement_time_in_minutes',
-                ('are_stocks_displayed', 'is_hidden', 'can_be_purchased'),
+                (
+                    'are_stocks_displayed',
+                    'is_hidden',
+                    'can_be_purchased',
+                    'is_balance_only',
+                ),
             ),
         }),
     )
