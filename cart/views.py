@@ -4,12 +4,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.services import get_user_or_raise_404
-from cart.models import CartProduct
+from cart.models import CartProduct, OrderProduct, Order
 from cart.services import (
     create_cart_product,
     get_cart_product_or_raise_404,
     delete_cart_product,
     update_cart_product_quantity,
+    create_order,
 )
 from core.serializers import LimitOffsetSerializer
 from products.services import get_product_or_raise_404
@@ -103,3 +104,61 @@ class CartProductRetrieveUpdateDeleteApi(APIView):
         cart_product = get_cart_product_or_raise_404(cart_product_id)
         update_cart_product_quantity(cart_product, quantity)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class OrderCreateApi(APIView):
+
+    class InputSerializer(serializers.Serializer):
+        payment_type = serializers.CharField(min_length=1, max_length=255)
+
+    class OutputListSerializer(serializers.Serializer):
+        class OrderProductSerializer(serializers.ModelSerializer):
+            product_id = serializers.IntegerField(source='product.id')
+            product_name = serializers.CharField(source='product.name')
+
+            class Meta:
+                model = OrderProduct
+                exclude = ('order', 'id', 'product')
+
+        id = serializers.IntegerField()
+        payment_type = serializers.CharField()
+        created_at = serializers.DateTimeField()
+        products = OrderProductSerializer(many=True, source='orderproduct_set')
+
+    class OutputCreateSerializer(serializers.Serializer):
+        class OrderProductSerializer(serializers.ModelSerializer):
+            product_id = serializers.IntegerField(source='product.id')
+            product_name = serializers.CharField(source='product.name')
+
+            class Meta:
+                model = OrderProduct
+                exclude = ('order', 'id', 'product')
+
+        order_id = serializers.IntegerField(source='order.id')
+        payment_type = serializers.CharField(source='order.payment_type')
+        created_at = serializers.DateTimeField(source='order.created_at')
+        products = OrderProductSerializer(many=True)
+
+    def get(self, request: Request, telegram_id: int):
+        user_orders = (
+            Order.objects
+            .prefetch_related('orderproduct_set')
+            .filter(user__telegram_id=telegram_id)
+        )
+        serializer = self.OutputListSerializer(user_orders, many=True)
+        response_data = {
+            'orders': serializer.data,
+        }
+        return Response(response_data)
+
+    def post(self, request: Request, telegram_id: int):
+        serializer = self.InputSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+
+        payment_type: str = serialized_data['payment_type']
+
+        user = get_user_or_raise_404(telegram_id)
+        created_order = create_order(user, payment_type)
+        serializer = self.OutputCreateSerializer(created_order)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

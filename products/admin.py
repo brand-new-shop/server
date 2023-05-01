@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
 
-from products.models import Category, Product, Order, ProductPicture
+from products.models import Category, Product, ProductPicture
 
 
 class CategoryParentListFilter(SimpleListFilter):
@@ -56,14 +56,6 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'priority',)
     inlines = (CategoryInline,)
     search_fields = ('name',)
-
-
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    date_hierarchy = 'created_at'
-    ordering = ('-created_at',)
-    search_fields = ('id', 'user__telegram_id')
-    search_help_text = 'Search by order ID or user Telegram ID'
 
 
 @admin.register(Product)

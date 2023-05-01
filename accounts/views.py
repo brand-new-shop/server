@@ -12,7 +12,6 @@ from accounts.serializers import (
     UserRetrieveSerializer,
     UserUpdateSerializer,
 )
-from products.models import Order, Product
 
 
 @api_view(['POST'])
@@ -43,46 +42,3 @@ class UserDetailView(APIView):
         if not is_updated:
             raise NotFound('User by Telegram ID is not found')
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class OrdersListCreateView(APIView):
-
-    def get(self, request, telegram_id: int):
-        limit = int(request.query_params.get('limit', 10))
-        offset = int(request.query_params.get('offset', 0))
-        orders = (
-            Order.objects
-            .select_related('user')
-            .select_related('product')
-            .filter(user__telegram_id=telegram_id)
-            .order_by('-created_at')
-            .values('id', 'product__name', 'quantity', 'total_price')[offset:offset + limit]
-        )
-        response_data = [{'id': order['id'], 'product_name': order['product__name'],
-                          'quantity': order['quantity'], 'total_price': order['total_price']}
-                         for order in orders]
-        return Response(response_data)
-
-
-@api_view(['GET'])
-def orders_count_view(request, telegram_id: int):
-    orders_count = Order.objects.select_related('user').filter(user__telegram_id=telegram_id).count()
-    return Response({'user_telegram_id': telegram_id, 'orders_total_count': orders_count})
-
-
-@api_view(['GET'])
-def orders_statistics_view(request, telegram_id: int):
-    orders = (
-        Order.objects
-        .select_related('user')
-        .filter(user__telegram_id=telegram_id)
-        .values('quantity', 'total_price')
-    )
-    orders_count = sum(order['quantity'] for order in orders)
-    orders_total_price = sum(order['total_price'] for order in orders)
-    response_data = {
-        'user_telegram_id': telegram_id,
-        'orders_count': orders_count,
-        'orders_total_price': orders_total_price,
-    }
-    return Response(response_data)
