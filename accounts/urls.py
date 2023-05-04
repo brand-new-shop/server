@@ -1,11 +1,11 @@
 from django.urls import path
 
 from accounts.views import (
-    user_create_view,
-    UserDetailView,
+    UserCreateApi,
+    UserRetrieveUpdateApi,
 )
 
 urlpatterns = [
-    path('', user_create_view),
-    path('telegram-id/<int:telegram_id>/', UserDetailView.as_view()),
+    path('', UserCreateApi.as_view()),
+    path('telegram-id/<int:telegram_id>/', UserRetrieveUpdateApi.as_view()),
 ]
