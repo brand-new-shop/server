@@ -1,11 +1,15 @@
+from decimal import Decimal
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 from django.db import transaction, IntegrityError
 
 from accounts.models import User
 from cart.exceptions import (
-    CartProductNotFound, NotEnoughProductStocks,
-    ProductAlreadyExistsInCart
+    CartProductNotFound,
+    NotEnoughProductStocks,
+    ProductAlreadyExistsInCart,
+    InsufficientBalance,
 )
 from cart.models import CartProduct, Order, OrderProduct
 from products.models import Product
@@ -65,6 +69,13 @@ def get_cart_product_or_raise_404(cart_product_id: int) -> CartProduct:
     return cart_product
 
 
+def calculate_total_cost(cart_products: Iterable[CartProduct]) -> Decimal:
+    return sum(
+        cart_product.quantity * cart_product.product.price
+        for cart_product in cart_products
+    )
+
+
 @transaction.atomic
 def create_order(user: User, payment_type: str) -> CreatedOrder:
     order = Order.objects.create(user=user, payment_type=payment_type)
@@ -78,6 +89,12 @@ def create_order(user: User, payment_type: str) -> CreatedOrder:
         ) for cart_product in user_cart_products
     ]
     created_order_products = OrderProduct.objects.bulk_create(order_products)
+    total_cost = calculate_total_cost(user_cart_products)
+    if total_cost > user.balance:
+        raise InsufficientBalance
+    user.balance -= total_cost
+    user.save()
+    user_cart_products.delete()
     return CreatedOrder(
         order=order,
         products=created_order_products,
