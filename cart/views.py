@@ -114,12 +114,12 @@ class OrderCreateApi(APIView):
 
     class OutputListSerializer(serializers.Serializer):
         class OrderProductSerializer(serializers.ModelSerializer):
-            product_id = serializers.IntegerField(source='product.id')
-            product_name = serializers.CharField(source='product.name')
+            id = serializers.IntegerField(source='product.id')
+            name = serializers.CharField(source='product.name')
 
             class Meta:
                 model = OrderProduct
-                exclude = ('order', 'id', 'product')
+                exclude = ('order', 'product')
 
         id = serializers.IntegerField()
         payment_type = serializers.CharField()
@@ -135,7 +135,7 @@ class OrderCreateApi(APIView):
                 model = OrderProduct
                 exclude = ('order', 'id', 'product')
 
-        order_id = serializers.IntegerField(source='order.id')
+        id = serializers.IntegerField(source='order.id')
         payment_type = serializers.CharField(source='order.payment_type')
         created_at = serializers.DateTimeField(source='order.created_at')
         products = OrderProductSerializer(many=True)
