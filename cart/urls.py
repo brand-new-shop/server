@@ -4,6 +4,7 @@ from cart.views import (
     CartProductListCreateApi,
     CartProductRetrieveUpdateDeleteApi,
     OrderCreateApi,
+    OrdersStatisticsApi,
 )
 
 urlpatterns = [
@@ -13,4 +14,8 @@ urlpatterns = [
         CartProductRetrieveUpdateDeleteApi.as_view(),
     ),
     path('users/<int:telegram_id>/orders/', OrderCreateApi.as_view()),
+    path(
+        'users/<int:telegram_id>/orders/statistics/',
+        OrdersStatisticsApi.as_view(),
+    ),
 ]

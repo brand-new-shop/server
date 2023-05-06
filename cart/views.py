@@ -1,3 +1,4 @@
+from django.db.models import Sum, F, Count
 from rest_framework import status, serializers
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -162,3 +163,26 @@ class OrderCreateApi(APIView):
         created_order = create_order(user, payment_type)
         serializer = self.OutputCreateSerializer(created_order)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class OrdersStatisticsApi(APIView):
+
+    class OutputSerializer(serializers.Serializer):
+        total_cost = serializers.DecimalField(max_digits=10, decimal_places=2)
+        total_count = serializers.IntegerField()
+
+    def get(self, request: Request, telegram_id: int):
+        orders_statistics = (
+            Order.objects
+            .filter(user__telegram_id=telegram_id)
+            .aggregate(
+                total_cost=Sum(
+                    F('orderproduct__quantity')
+                    * F('orderproduct__product_price_at_the_moment'),
+                    default=0,
+                ),
+                total_count=Count('id'),
+            )
+        )
+        serializer = self.OutputSerializer(orders_statistics)
+        return Response(serializer.data)
