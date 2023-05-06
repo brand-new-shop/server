@@ -107,7 +107,7 @@ class CartProductRetrieveUpdateDeleteApi(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class OrderCreateApi(APIView):
+class OrderListCreateApi(APIView):
 
     class InputSerializer(serializers.Serializer):
         payment_type = serializers.CharField(min_length=1, max_length=255)
