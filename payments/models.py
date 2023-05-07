@@ -21,6 +21,7 @@ class CoinbasePayment(models.Model):
         default=Status.PENDING,
     )
     type = models.PositiveSmallIntegerField(choices=Type.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Coinbase: {str(self.uuid)}'
