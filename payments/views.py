@@ -35,8 +35,12 @@ class BalanceTopUpViaCoinbasePaymentCreateApi(APIView):
             payment_amount=payment_amount,
             type=CoinbasePayment.Type.BALANCE_TOP_UP,
         )
-        return Response({'uuid': charge.uuid, 'hosted_url': charge.hosted_url},
-                        status=status.HTTP_201_CREATED)
+        response_data = {
+            'uuid': charge.uuid,
+            'hosted_url': charge.hosted_url,
+            'amount': payment_amount,
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 class PaymentForOrderViaCoinbaseCreateApi(APIView):
@@ -57,5 +61,6 @@ class PaymentForOrderViaCoinbaseCreateApi(APIView):
         response_data = {
             'uuid': charge.uuid,
             'hosted_url': charge.hosted_url,
+            'amount': payment_amount,
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
