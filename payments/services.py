@@ -20,7 +20,7 @@ def create_charge(
     charge = client.charge.create(
         name=f'User {telegram_id} balance top-up',
         description=None,
-        local_price={'amount': payment_amount, 'currency': 'USD'},
+        local_price={'amount': str(payment_amount), 'currency': 'USD'},
         pricing_type='fixed_price',
     )
     return CoinbaseCharge(

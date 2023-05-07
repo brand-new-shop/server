@@ -1,8 +1,21 @@
 from django.urls import path
 
-from cart.views import CartProductListCreateView, CartProductDetailView
+from cart.views import (
+    CartProductListCreateApi,
+    CartProductRetrieveUpdateDeleteApi,
+    OrderListCreateApi,
+    OrdersStatisticsApi,
+)
 
 urlpatterns = [
-    path('users/<int:telegram_id>/', CartProductListCreateView.as_view()),
-    path('<int:cart_product_id>/', CartProductDetailView.as_view()),
+    path('users/<int:telegram_id>/', CartProductListCreateApi.as_view()),
+    path(
+        '<int:cart_product_id>/',
+        CartProductRetrieveUpdateDeleteApi.as_view(),
+    ),
+    path('users/<int:telegram_id>/orders/', OrderListCreateApi.as_view()),
+    path(
+        'users/<int:telegram_id>/orders/statistics/',
+        OrdersStatisticsApi.as_view(),
+    ),
 ]

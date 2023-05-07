@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from rest_framework import status
-from rest_framework.exceptions import NotFound, APIException, PermissionDenied
+from rest_framework.exceptions import NotFound, APIException
 
 
 class NotEnoughProductStocks(NotFound):
@@ -14,3 +14,8 @@ class ProductAlreadyExistsInCart(APIException):
 
 class CartProductNotFound(NotFound):
     default_detail = _('Cart product is not found')
+
+
+class InsufficientBalance(APIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _('User does not have enough money on your balance')

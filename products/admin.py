@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.utils.translation import gettext_lazy as _
 
-from products.models import Category, Product, Order, ProductPicture
+from products.models import Category, Product, ProductPicture
 
 
 class CategoryParentListFilter(SimpleListFilter):
@@ -27,6 +27,16 @@ class CategoryInline(admin.TabularInline):
     model = Category
     verbose_name = 'subcategory'
     verbose_name_plural = 'subcategories'
+    extra = 0
+
+    def has_add_permission(self, request, obj):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ProductInline(admin.StackedInline):
@@ -48,14 +58,6 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    date_hierarchy = 'created_at'
-    ordering = ('-created_at',)
-    search_fields = ('id', 'user__telegram_id')
-    search_help_text = 'Search by order ID or user Telegram ID'
-
-
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category')
@@ -74,16 +76,22 @@ class ProductAdmin(admin.ModelAdmin):
                 'category',
                 'price',
                 'stocks_count',
-                'content',
-                'type',
             )
         }),
         ('Specific Advanced Settings', {
             'classes': ('collapse',),
             'fields': (
-                ('min_order_quantity', 'max_order_quantity'),
+                (
+                    'min_order_quantity',
+                    'max_order_quantity',
+                ),
                 'max_replacement_time_in_minutes',
-                ('are_stocks_displayed', 'is_hidden', 'can_be_purchased'),
+                (
+                    'are_stocks_displayed',
+                    'is_hidden',
+                    'can_be_purchased',
+                    'is_balance_only',
+                ),
             ),
         }),
     )

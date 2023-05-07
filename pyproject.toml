@@ -23,6 +23,7 @@ httpx = "^0.23.3"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.0.3"
+django-silk = "^5.0.3"
 
 [build-system]
 requires = ["poetry-core"]
