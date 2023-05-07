@@ -27,5 +27,10 @@ class BalanceTopUpViaCoinbasePaymentCreateApi(APIView):
         user = get_user_or_raise_404(telegram_id)
         client = coinbase_commerce.Client(settings.COINBASE_API_KEY)
         charge = create_charge(client, telegram_id, payment_amount)
-        CoinbasePayment.objects.create(user=user, uuid=charge.uuid, payment_amount=payment_amount)
+        CoinbasePayment.objects.create(
+            user=user,
+            uuid=charge.uuid,
+            payment_amount=payment_amount,
+            type=CoinbasePayment.Type.BALANCE_TOP_UP,
+        )
         return Response({'uuid': charge.uuid, 'hosted_url': charge.hosted_url}, status=status.HTTP_201_CREATED)
