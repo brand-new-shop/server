@@ -32,7 +32,8 @@ def create_charge(
     )
 
 
-def get_charge(client: coinbase_commerce.Client, charge_uuid: UUID) -> CoinbaseCharge:
+def get_charge(client: coinbase_commerce.Client,
+               charge_uuid: UUID) -> CoinbaseCharge:
     try:
         charge = client.charge.retrieve(str(charge_uuid))
     except ResourceNotFoundError:
@@ -51,5 +52,10 @@ def top_up_user_balance(user: User, coinbase_payment: CoinbasePayment):
     user.balance = user.balance + coinbase_payment.payment_amount
     user.save()
     logging.info('User balance has been refilled')
-    coinbase_payment.delete()
-    logging.info(f'Coinbase payment {str(coinbase_payment.uuid)} was deleted')
+    coinbase_payment.status = CoinbasePayment.Status.SUCCESS
+    coinbase_payment.save()
+
+
+def set_coinbase_payment_as_failed(payment: CoinbasePayment) -> None:
+    payment.status = CoinbasePayment.Status.FAILED
+    payment.save()
