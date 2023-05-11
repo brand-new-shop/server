@@ -6,7 +6,7 @@ from products.models import Category, Product, ProductPicture
 
 
 class CategoryParentListFilter(SimpleListFilter):
-    title = _('category_without_parent')
+    title = _('category type')
     parameter_name = 'category_without_parent'
 
     def lookups(self, request, model_admin):
@@ -51,18 +51,24 @@ class ProductPictureInline(admin.StackedInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_filter = (CategoryParentListFilter,)
+    list_filter = (CategoryParentListFilter, 'is_hidden')
     ordering = ('priority',)
-    list_display = ('__str__', 'priority',)
+    list_display = ('__str__', 'priority', 'is_hidden')
     inlines = (CategoryInline,)
     search_fields = ('name',)
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category')
+    list_display = ('name', 'category', 'stocks_count')
     list_select_related = ('category',)
-    list_filter = ('category',)
+    list_filter = (
+        'category',
+        'is_balance_only',
+        'is_hidden',
+        'can_be_purchased',
+        'are_stocks_displayed'
+    )
     ordering = ('name',)
     search_fields = ('name',)
     search_help_text = 'Search by product\'s name'
